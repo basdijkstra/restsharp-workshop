@@ -74,7 +74,7 @@ namespace RestSharpWorkshop.Examples
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            var responseData = JObject.Parse(response.Content);
+            JObject responseData = JObject.Parse(response.Content);
 
             Assert.That(responseData.GetValue("name").ToString(), Is.EqualTo("Patricia Lebsack"));
         }
