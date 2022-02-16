@@ -4,11 +4,12 @@ using NUnit.Framework;
 using RestSharp;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace RestSharpWorkshop.Examples
 {
     [TestFixture]
-    public class Examples1
+    public class Examples01
     {
         // The base URL for our example tests
         private const string BASE_URL = "http://jsonplaceholder.typicode.com";
@@ -23,41 +24,41 @@ namespace RestSharpWorkshop.Examples
         }
 
         [Test]
-        public void GetDataForUser1_CheckStatusCode_ShouldBeHttpOK()
+        public async Task GetDataForUser1_CheckStatusCode_ShouldBeHttpOK()
         {
-            RestRequest request = new RestRequest("/users/1", Method.GET);
+            RestRequest request = new RestRequest("/users/1", Method.Get);
 
-            IRestResponse response = client.Execute(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
-        public void GetDataForUser1_CheckStatusCode_ShouldBeHttp200()
+        public async Task GetDataForUser1_CheckStatusCode_ShouldBeHttp200()
         {
-            RestRequest request = new RestRequest("/users/1", Method.GET);
+            RestRequest request = new RestRequest("/users/1", Method.Get);
 
-            IRestResponse response = client.Execute(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             Assert.That((int)response.StatusCode, Is.EqualTo(200));
         }
 
         [Test]
-        public void GetDataForUser2_CheckContentType_ShouldBeApplicationJson()
+        public async Task GetDataForUser2_CheckContentType_ShouldBeApplicationJson()
         {
-            RestRequest request = new RestRequest("/users/2", Method.GET);
+            RestRequest request = new RestRequest("/users/2", Method.Get);
 
-            IRestResponse response = client.Execute(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             Assert.That(response.ContentType, Does.Contain("application/json"));
         }
 
         [Test]
-        public void GetDataForUser3_CheckServerHeader_ShouldBeCloudflare()
+        public async Task GetDataForUser3_CheckServerHeader_ShouldBeCloudflare()
         {
-            RestRequest request = new RestRequest("/users/3", Method.GET);
+            RestRequest request = new RestRequest("/users/3", Method.Get);
 
-            IRestResponse response = client.Execute(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             string serverHeaderValue = response.Headers
                 .Where(x => x.Name.Equals("Server"))
@@ -68,11 +69,11 @@ namespace RestSharpWorkshop.Examples
         }
 
         [Test]
-        public void GetDataForUser4_CheckName_ShouldBePatriciaLebsack()
+        public async Task GetDataForUser4_CheckName_ShouldBePatriciaLebsack()
         {
-            RestRequest request = new RestRequest("/users/4", Method.GET);
+            RestRequest request = new RestRequest("/users/4", Method.Get);
 
-            IRestResponse response = client.Execute(request);
+            RestResponse response = await client.ExecuteAsync(request);
 
             var responseData = JObject.Parse(response.Content);
 
