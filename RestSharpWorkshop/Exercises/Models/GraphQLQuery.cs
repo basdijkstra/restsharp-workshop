@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RestSharpWorkshop.Examples.Models
+namespace RestSharpWorkshop.Exercises.Models
 {
     public class GraphQLQuery
     {
