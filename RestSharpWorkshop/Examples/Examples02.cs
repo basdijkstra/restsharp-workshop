@@ -33,7 +33,7 @@ namespace RestSharpWorkshop.Examples
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.GetValue("name").ToString(), Is.EqualTo(expectedName));
+            Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo(expectedName));
         }
 
         [Test, TestCaseSource("UserData")]
@@ -46,7 +46,7 @@ namespace RestSharpWorkshop.Examples
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.GetValue("name").ToString(), Is.EqualTo(expectedName));
+            Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo(expectedName));
         }
 
         private static IEnumerable<TestCaseData> UserData()
