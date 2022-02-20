@@ -59,11 +59,6 @@ namespace RestSharpWorkshop.Exercises
         }
 
         /**
-         * NOTE: this exercise might require some Google-fu to find out
-         * how to get the right element from the response!
-         * HINT: look for information on the SelectToken() method of the JObject class
-         * Can you explain the difference between GetValue() and SelectToken() ?
-         * 
          * Send a new GET request to /us/90210 using the client defined above.
          * Check that the first place in the response body contains a JSON field 'state' with value 'California'.
          */

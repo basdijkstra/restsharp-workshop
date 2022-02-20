@@ -76,7 +76,19 @@ namespace RestSharpWorkshop.Examples
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.GetValue("name").ToString(), Is.EqualTo("Patricia Lebsack"));
+            Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo("Patricia Lebsack"));
+        }
+
+        [Test]
+        public async Task GetDataForUser5_CheckCompanyName_ShouldBeKeeblerLLC()
+        {
+            RestRequest request = new RestRequest("/users/5", Method.Get);
+
+            RestResponse response = await client.ExecuteAsync(request);
+
+            JObject responseData = JObject.Parse(response.Content);
+
+            Assert.That(responseData.SelectToken("company.name").ToString(), Is.EqualTo("Keebler LLC"));
         }
     }
 }
