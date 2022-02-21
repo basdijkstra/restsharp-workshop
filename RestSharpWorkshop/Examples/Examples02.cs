@@ -36,6 +36,24 @@ namespace RestSharpWorkshop.Examples
             Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo(expectedName));
         }
 
+        /*
+        [TestCase(1, "Leanne Graham", TestName = "User 1 is Leanne Graham")]
+        [TestCase(2, "Ervin Howell", TestName = "User 2 is Ervin Howell")]
+        [TestCase(3, "Clementine Bauch", TestName = "User 3 is Clementine Bauch")]
+        public async Task GetDataForUser_CheckName_ShouldEqualExpectedName_UsingTestCase_ExplicitPathSegment
+            (int userId, string expectedName)
+        {
+            RestRequest request = new RestRequest("/users/{userId}", Method.Get);
+
+            request.AddUrlSegment("userId", userId);
+
+            RestResponse response = await client.ExecuteAsync(request);
+
+            JObject responseData = JObject.Parse(response.Content);
+
+            Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo(expectedName));
+        }
+
         [Test, TestCaseSource("UserData")]
         public async Task GetDataForUser_CheckName_ShouldEqualExpectedName_UsingTestCaseSource
             (int userId, string expectedName)
@@ -58,5 +76,6 @@ namespace RestSharpWorkshop.Examples
             yield return new TestCaseData(3, "Clementine Bauch").
                 SetName("User 3 is Clementine Bauch - using TestCaseSource");
         }
+        */
     }
 }
