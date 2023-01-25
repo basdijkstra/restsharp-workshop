@@ -12,6 +12,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
+    <PackageReference Include="WireMock.Net" Version="1.5.14" />
   </ItemGroup>
 
 </Project>
