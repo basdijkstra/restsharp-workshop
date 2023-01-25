@@ -1,73 +1,67 @@
-﻿using NUnit.Framework;
+﻿using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using RestSharp;
-using RestSharpWorkshop.Answers.Models;
+using RestSharp.Authenticators;
+using RestSharp.Authenticators.OAuth2;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace RestSharpWorkshop.Answers
 {
     [TestFixture]
-    public class Answers03
+    public class Answers03 : TestBase
     {
-        // The base URLs for our tests
-        private const string BASE_URL_ZIP = "http://api.zippopotam.us";
-        private const string BASE_URL_COMMENT = "http://jsonplaceholder.typicode.com";
+        // The base URL for our example tests
+        private const string BASE_URL = "http://localhost:9876";
 
-        // The RestSharp clients we'll use to make our requests
-        private RestClient clientZip;
-        private RestClient clientComment;
+        // The RestSharp client we'll use to make our requests
+        private RestClient client;
 
         [OneTimeSetUp]
         public void SetupRestSharpClient()
         {
-            clientZip = new RestClient(BASE_URL_ZIP);
-            clientComment = new RestClient(BASE_URL_COMMENT);
+            client = new RestClient(BASE_URL);
         }
 
         /**
-         * Send a GET request to /us/90210 using the clientZip client defined above.
-         * Deserialize the response into an object of type RestResponse<LocationData>
-         * and extract its Data property into an object of type LocationData.
-         * Assert that the State property of the first Place in the Places property
-         * (hint: use the array index [0]) of that object has value 'California'.
+         * Perform a GET request to /token and pass in basic
+         * authentication details with username 'john' and
+         * password 'demo'.
+         * 
+         * Extract the value of the 'token' element in the
+         * response into a string variable.
+         * 
+         * Use the token to authenticate using OAuth2 when sending
+         * a GET request to /secure/customer/12212
+         * 
+         * Verify that the status code of this response is equal to HTTP 200
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckState_ShouldEqualCalifornia()
+        public async Task GetTokenUsingBasicAuth_UseInOAuht2_CheckResponseStatusCode()
         {
-            RestRequest request = new RestRequest($"/us/90210", Method.Get);
+            // Set the correct basic auth credentials on the client
+            client.Authenticator = new HttpBasicAuthenticator("john", "demo");
 
-            RestResponse<LocationData> response = await clientZip.ExecuteAsync<LocationData>(request);
+            // Perform the first request using basic auth
+            RestRequest request = new RestRequest("/token", Method.Get);
 
-            LocationData locationData = response.Data;
+            RestResponse response = await client.ExecuteAsync(request);
 
-            Assert.That(locationData.Places[0].State, Is.EqualTo("California"));
-        }
+            JObject responseData = JObject.Parse(response.Content);
 
-        /**
-         * Create a new object of type Comment and set values for the PostId (integer, use 1),
-         * Name, Email and Body (all string).
-         * Send a POST request using the serialized Comment object as JSON body to /comments.
-         * Use the clientComment RestSharp client to do this!
-         * Check that the response HTTP status code is equal to Created.
-         */
-        [Test]
-        public async Task PostNewComment_CheckStatusCode_ShouldEqualHttpCreated()
-        {
-            Comment comment = new Comment
-            {
-                PostId = 1,
-                Name = "John Doe",
-                Email = "john@doe.com",
-                Body = "Here's a comment on your recent post"
-            };
+            // Store the token in a string
+            string token = responseData.SelectToken("token").ToString();
 
-            RestRequest request = new RestRequest($"/comments", Method.Post);
+            // Set OAuth2 authentication using the token retrieved before
+            client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(token, "Bearer");
 
-            request.AddJsonBody(comment);
+            // Perform the second request using OAuth2
+            request = new RestRequest("/secure/customer/12212", Method.Get);
 
-            RestResponse response = await clientComment.ExecuteAsync(request);
+            response = await client.ExecuteAsync(request);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            // Check that the status code is equal to 200
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
     }
 }

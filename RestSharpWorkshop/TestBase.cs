@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
@@ -25,12 +26,14 @@ namespace RestSharpWorkshop
 
         private void SetupMockAnswers()
         {
-            AddMockAnswerForCustomer12212();
-            AddMockAnswerForCustomer12345();
-            AddMockAnswerForCustomer12456();
+            AddMockResponseForCustomer12212();
+            AddMockResponseForCustomer12345();
+            AddMockResponseForCustomer12456();
+            AddMockResponseForBasicAuth();
+            AddMockResponseForOAuth2();
         }
 
-        private void AddMockAnswerForCustomer12212()
+        private void AddMockResponseForCustomer12212()
         {
             var customer = new
             {
@@ -51,7 +54,7 @@ namespace RestSharpWorkshop
                 .WithStatusCode(200));
         }
 
-        private void AddMockAnswerForCustomer12345()
+        private void AddMockResponseForCustomer12345()
         {
             var customer = new
             {
@@ -71,7 +74,7 @@ namespace RestSharpWorkshop
                 .WithStatusCode(200));
         }
 
-        private void AddMockAnswerForCustomer12456()
+        private void AddMockResponseForCustomer12456()
         {
             var customer = new
             {
@@ -88,6 +91,29 @@ namespace RestSharpWorkshop
                 .RespondWith(Response.Create()
                 .WithHeader("Content-Type", "application/json")
                 .WithBodyAsJson(customer)
+                .WithStatusCode(200));
+        }
+
+        private void AddMockResponseForBasicAuth()
+        {
+            var response = new
+            {
+                token = "this_is_your_oauth2_token"
+            };
+
+            this.Server.Given(Request.Create().WithPath("/token").UsingGet()
+                .WithHeader("Authorization", new ExactMatcher("Basic am9objpkZW1v")))
+                .RespondWith(Response.Create()
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(response)
+                .WithStatusCode(200));
+        }
+
+        private void AddMockResponseForOAuth2()
+        {
+            this.Server?.Given(Request.Create().WithPath("/secure/customer/12212").UsingGet()
+                .WithHeader("Authorization", new ExactMatcher("Bearer this_is_your_oauth2_token")))
+                .RespondWith(Response.Create()
                 .WithStatusCode(200));
         }
     }
