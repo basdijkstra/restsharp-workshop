@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace RestSharpWorkshop.Exercises
 {
     [TestFixture]
-    public class Exercises02
+    public class Exercises02 : TestBase
     {
         // The base URL for our example tests
-        private const string BASE_URL = "http://api.zippopotam.us";
+        private const string BASE_URL = "http://localhost:9876";
 
         // The RestSharp client we'll use to make our requests
         private RestClient client;
@@ -25,48 +25,46 @@ namespace RestSharpWorkshop.Exercises
          * Refactor these three tests into a single, data driven test using the
          * [TestCase] attribute.
          * Add parameters to the test method and think about their data types.
-         * You will need three parameters: country code (input), zip code (input) and
-         * state (expected output).
          * Replace fixed values with parameterized values to make the tests data driven.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckState_ShouldBeCalifornia()
+        public async Task GetDataForCustomer12212_CheckFirstName_ShouldBeJohn()
         {
-            RestRequest request = new RestRequest($"/us/90210", Method.Get);
+            RestRequest request = new RestRequest($"/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.SelectToken("places[0].state").ToString(), Is.EqualTo("California"));
+            Assert.That(responseData.SelectToken("firstName").ToString(), Is.EqualTo("John"));
         }
 
         [Test]
-        public async Task GetDataForItZipCode50123_CheckState_ShouldBeToscana()
+        public async Task GetDataForCustomer12345_CheckFirstName_ShouldBeSusan()
         {
-            RestRequest request = new RestRequest($"/it/50123", Method.Get);
+            RestRequest request = new RestRequest($"/customer/12345", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.SelectToken("places[0].state").ToString(), Is.EqualTo("Toscana"));
+            Assert.That(responseData.SelectToken("firstName").ToString(), Is.EqualTo("Susan"));
         }
 
         [Test]
-        public async Task GetDataForCaZipCodeY1A_CheckState_ShouldBeYukon()
+        public async Task GetDataForCustomer12456_CheckFirstName_ShouldBeAnna()
         {
-            RestRequest request = new RestRequest($"/ca/Y1A", Method.Get);
+            RestRequest request = new RestRequest($"/customer/12456", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.SelectToken("places[0].state").ToString(), Is.EqualTo("Yukon"));
+            Assert.That(responseData.SelectToken("firstName").ToString(), Is.EqualTo("Anna"));
         }
 
         /**
-         * Do the same, but now using the [TestCaseSource] attribute. Refer to the ZipCodeData
+         * Do the same, but now using the [TestCaseSource] attribute. Refer to the CustomerData
          * method defined below.
          */
         [Test]
@@ -78,16 +76,16 @@ namespace RestSharpWorkshop.Exercises
 
         /**
          * Complete the body of this method to return the required test data:
-         * | country code | zip code | expected state |
-         * | ------------ | -------- | -------------- |
-         * |           us |    90210 |     California |
-         * |           it |    50123 |        Toscana |
-         * |           ca |      Y1A |          Yukon |
+         * | customerId | expectedFirstName |
+         * | ---------- | ----------------- |
+         * |      12212 |              John |
+         * |      12345 |             Susan |
+         * |      12456 |              Anna |
          * Set the test name for each iteration using the .SetName() method.
          * Make sure to use a different test name compared to the previous exercise
          * to ensure that all iterations are seen as different tests!
          */
-        private static IEnumerable<TestCaseData> ZipCodeData()
+        private static IEnumerable<TestCaseData> CustomerData()
         {
             return null;
         }
