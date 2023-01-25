@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace RestSharpWorkshop.Answers
 {
     [TestFixture]
-    public class Answers01
+    public class Answers01 : TestBase
     {
         // The base URL for our example tests
-        private const string BASE_URL = "http://api.zippopotam.us";
+        private const string BASE_URL = "http://localhost:9876";
 
         // The RestSharp client we'll use to make our requests
         private RestClient client;
@@ -23,13 +23,13 @@ namespace RestSharpWorkshop.Answers
         }
 
         /**
-         * Send a new GET request to /us/90210 using the client defined above.
+         * Send a new GET request to /customer/12212 using the client defined above.
          * Check that the HTTP response code is equal to HttpStatusCode.OK.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckStatusCode_ShouldBeHttpOK()
+        public async Task GetDataForCustomer12212_CheckStatusCode_ShouldBeHttpOK()
         {
-            RestRequest request = new RestRequest("/us/90210", Method.Get);
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
@@ -37,68 +37,68 @@ namespace RestSharpWorkshop.Answers
         }
 
         /**
-         * Send a new GET request to /us/90210 using the client defined above.
-         * Check that the response content type contains 'application/json'.
+         * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the response content type is equal to 'application/json'.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckContentType_ShouldContainApplicationJson()
+        public async Task GetDataForCustomer12212_CheckContentType_ShouldContainApplicationJson()
         {
-            RestRequest request = new RestRequest("/us/90210", Method.Get);
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            Assert.That(response.ContentType, Does.Contain("application/json"));
+            Assert.That(response.ContentType, Is.EqualTo("application/json"));
         }
 
         /**
-         * Send a new GET request to /us/90210 using the client defined above.
-         * Check that the response contains a header 'charset' with value 'UTF-8'.
+         * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the response contains a header 'Server' with value 'MockServer'.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckCharsetHeader_ShouldBeUTF8()
+        public async Task GetDataForCustomer12212_CheckServerHeader_ShouldBeMockServer()
         {
-            RestRequest request = new RestRequest("/us/90210", Method.Get);
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            string charsetHeaderValue = response.Headers
-                .Where(x => x.Name.Equals("charset"))
+            string serverHeaderValue = response.Headers
+                .Where(x => x.Name.Equals("Server"))
                 .Select(x => x.Value.ToString())
                 .FirstOrDefault();
 
-            Assert.That(charsetHeaderValue, Is.EqualTo("UTF-8"));
+            Assert.That(serverHeaderValue, Is.EqualTo("MockServer"));
         }
 
         /**
-         * Send a new GET request to /us/90210 using the client defined above.
-         * Check that the response body contains a JSON field 'country' with value 'United States'.
+         * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the response body contains a JSON field 'firstName' with value 'John'.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckCountry_ShouldBeUnitedStates()
+        public async Task GetDataForCustomer12212_CheckFirstName_ShouldBeJohn()
         {
-            RestRequest request = new RestRequest("/us/90210", Method.Get);
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.SelectToken("country").ToString(), Is.EqualTo("United States"));
+            Assert.That(responseData.SelectToken("firstName").ToString(), Is.EqualTo("John"));
         }
 
         /**
-         * Send a new GET request to /us/90210 using the client defined above.
-         * Check that the first place in the response body contains a JSON field 'state' with value 'California'.
+         * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the JSON field 'city', which is a child element of 'address', has value 'Beverly Hills'.
          */
         [Test]
-        public async Task GetDataForUsZipCode90210_CheckStateForFirstPlace_ShouldBeCalifornia()
+        public async Task GetDataForCustomer12212_CheckCityInAddress_ShouldBeBeverlyHills()
         {
-            RestRequest request = new RestRequest("/us/90210", Method.Get);
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
 
             RestResponse response = await client.ExecuteAsync(request);
 
             JObject responseData = JObject.Parse(response.Content);
 
-            Assert.That(responseData.SelectToken("places[0].state").ToString(), Is.EqualTo("California"));
+            Assert.That(responseData.SelectToken("address.city").ToString(), Is.EqualTo("Beverly Hills"));
         }
     }
 }
