@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using RestSharp;
 using RestSharpWorkshop.Examples.Models;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RestSharpWorkshop.Examples
@@ -11,7 +10,7 @@ namespace RestSharpWorkshop.Examples
     public class Examples04
     {
         // The base URL for our example tests
-        private const string BASE_URL = "https://graphql-weather-api.herokuapp.com/";
+        private const string BASE_URL = "http://jsonplaceholder.typicode.com";
 
         // The RestSharp client we'll use to make our requests
         private RestClient client;
@@ -23,81 +22,34 @@ namespace RestSharpWorkshop.Examples
         }
 
         [Test]
-        public async Task GetWeatherForAmsterdam_CheckSummaryTitle()
+        public async Task GetDataForUser1_CheckName_ShouldEqualLeanneGraham()
         {
-            string query = @"
-                {
-                    getCityByName(name: ""Amsterdam"") {
-                        weather {
-                            summary {
-                                title
-                            }
-                        }
-                    }
-                }
-            ";
+            RestRequest request = new RestRequest($"/users/1", Method.Get);
 
-            GraphQLQuery graphQLQuery = new GraphQLQuery
-            {
-                Query = query,
-            };
+            RestResponse<User> response = await client.ExecuteAsync<User>(request);
 
-            RestRequest request = new RestRequest("/", Method.Post);
+            User user = response.Data;
 
-            request.AddJsonBody(graphQLQuery);
-
-            RestResponse response = await client.ExecuteAsync(request);
-
-            JObject responseData = JObject.Parse(response.Content);
-
-            Assert.That(
-                responseData.SelectToken("data.getCityByName.weather.summary.title").ToString(),
-                Is.EqualTo("Clouds")
-            );
+            Assert.That(user.Name, Is.EqualTo("Leanne Graham"));
         }
 
-        [TestCase("Amsterdam", "Clouds", TestName = "In Amsterdam the weather is cloudy")]
-        [TestCase("Berlin", "Clouds", TestName = "In Berlin the weather is cloudy")]
-        [TestCase("Rome", "Clear", TestName = "In Rome the weather is clear")]
-        public async Task GetWeatherForAmsterdam_CheckSummaryTitle_UsingParameterizedQuery
-            (string city, string expectedWeather)
+        [Test]
+        public async Task PostNewPost_CheckStatusCode_ShouldBeHttpCreated()
         {
-            string query = @"
-                query GetWeatherForCity($name: String!)
-                {
-                    getCityByName(name: $name) {
-                        weather {
-                            summary {
-                                title
-                            }
-                        }
-                    }
-                }
-            ";
-
-            var variables = new
+            Post post = new Post
             {
-                name = city
+                UserId = 1,
+                Title = "My new post title",
+                Body = "This is the body of my new post"
             };
 
-            GraphQLQuery graphQLQuery = new GraphQLQuery
-            {
-                Query = query,
-                Variables = JsonConvert.SerializeObject(variables)
-            };
+            RestRequest request = new RestRequest($"/posts", Method.Post);
 
-            RestRequest request = new RestRequest("/", Method.Post);
-
-            request.AddJsonBody(graphQLQuery);
+            request.AddJsonBody(post);
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            JObject responseData = JObject.Parse(response.Content);
-
-            Assert.That(
-                responseData.SelectToken("data.getCityByName.weather.summary.title").ToString(),
-                Is.EqualTo(expectedWeather)
-            );
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         }
     }
 }

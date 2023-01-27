@@ -10,6 +10,16 @@ namespace RestSharpWorkshop
     {
         protected WireMockServer Server { get; private set; }
 
+        
+
+        private readonly string parameterizedQuery = @"query getRocketData($id: ID!)
+            {
+                rocket(id: $id) {
+                    name
+                    country
+                }
+            }";
+
         [SetUp]
         public void StartServer()
         {
@@ -31,6 +41,10 @@ namespace RestSharpWorkshop
             AddMockResponseForCustomer12456();
             AddMockResponseForBasicAuth();
             AddMockResponseForOAuth2();
+            AddMockResponseForPostAccount();
+            AddMockResponseForGetAccount12345();
+            AddMockResponseForSimpleGraphQLQuery();
+            AddMockResponseForGraphQLQueryWithVariables();
         }
 
         private void AddMockResponseForCustomer12212()
@@ -115,6 +129,92 @@ namespace RestSharpWorkshop
                 .WithHeader("Authorization", new ExactMatcher("Bearer this_is_your_oauth2_token")))
                 .RespondWith(Response.Create()
                 .WithStatusCode(200));
+        }
+
+        private void AddMockResponseForPostAccount()
+        {
+            this.Server?.Given(Request.Create().WithPath("/customer/12212/accounts").UsingPost()
+                .WithBody(new JsonMatcher("{\"type\": \"savings\", \"balance\": 0}")))
+                .RespondWith(Response.Create()
+                .WithStatusCode(201));
+        }
+
+        private void AddMockResponseForGetAccount12345()
+        {
+            var account = new
+            {
+                type = "savings",
+                balance = 98765
+            };
+
+            this.Server.Given(Request.Create().WithPath("/customer/12212/account/12345").UsingGet())
+                .RespondWith(Response.Create()
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(account)
+                .WithStatusCode(200));
+        }
+
+        /// <summary>
+        /// Creates the stub response for the simple GraphQL example.
+        /// </summary>
+        private void AddMockResponseForSimpleGraphQLQuery()
+        {
+            var expectedQuery = new
+            {
+                query = "{ company { name ceo } }"
+            };
+
+            var response = new
+            {
+                data = new
+                {
+                    company = new
+                    {
+                        name = "SpaceX",
+                        ceo = "Elon Musk",
+                    },
+                },
+            };
+
+            this.Server?.Given(Request.Create().WithPath("/simple-graphql").UsingPost()
+                .WithBody(new JsonMatcher(expectedQuery)))
+                .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(response));
+        }
+
+        private void AddMockResponseForGraphQLQueryWithVariables()
+        {
+            var expectedQuery = new
+            {
+                query = this.parameterizedQuery,
+                operationName = "getRocketData",
+                variables = new
+                {
+                    id = "falcon1",
+                },
+            };
+
+            var response = new
+            {
+                data = new
+                {
+                    rocket = new
+                    {
+                        name = "Falcon 1",
+                        country = "Republic of the Marshall Islands",
+                    },
+                },
+            };
+
+            this.Server?.Given(Request.Create().WithPath("/graphql-with-variables").UsingPost()
+                .WithHeader("Content-Type", "application/graphql+json; charset=utf-8")
+                .WithBody(new JsonMatcher(expectedQuery)))
+                .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(response));
         }
     }
 }

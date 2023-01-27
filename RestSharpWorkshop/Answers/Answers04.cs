@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using RestSharp;
 using RestSharpWorkshop.Answers.Models;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RestSharpWorkshop.Answers
 {
     [TestFixture]
-    public class Answers04
+    public class Exercises04 : TestBase
     {
         // The base URL for our tests
-        private const string BASE_URL = "https://api.spacex.land/graphql/";
+        private const string BASE_URL = "http://localhost:9876";
 
         // The RestSharp client we'll use to make our requests
         private RestClient client;
@@ -22,114 +21,48 @@ namespace RestSharpWorkshop.Answers
             client = new RestClient(BASE_URL);
         }
 
-        /*******************************************************
-         * Create a new GraphQL query as a string with value
-         * { company { name ceo coo } }
-         *
-         * Create a new GraphQLQuery object and use the query as
-         * the value for the Query property
+        /**
+         * Create a new Account object with 'savings' as the account type and balance 0
          * 
-         * POST this object to https://api.spacex.land/graphql/
-         * (that's the base URL, so '/' suffices as an endpoint)
-         *
-         * Assert that the name of the CEO is Elon Musk
-         *
-         * Use "data.company.ceo" as the argument to SelectToken()
-         * to extract the required value from the response
+         * POST this object to /customer/12212/accounts
+         * 
+         * Verify that the response HTTP status code is equal to 201 (Created)
          */
         [Test]
-        public async Task GetCompanyData_checkCeo_shouldBeElonMusk()
+        public async Task PostSavingsAccount_CheckStatusCode_ShouldEqual201()
         {
-            string query = "{ company { name ceo coo } }";
-
-            GraphQLQuery graphQLQuery = new GraphQLQuery
+            Account account = new Account
             {
-                Query = query
+                Type = "savings",
+                Balance = 0
             };
 
-            RestRequest request = new RestRequest("/", Method.Post);
+            RestRequest request = new RestRequest($"/customer/12212/accounts", Method.Post);
 
-            request.AddJsonBody(graphQLQuery);
+            request.AddJsonBody(account);
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            JObject responseData = JObject.Parse(response.Content);
-
-            Assert.That(
-                responseData.SelectToken("data.company.ceo").ToString(),
-                Is.EqualTo("Elon Musk")
-            );
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         }
 
-        /*******************************************************
-         * Create a data driven test with three TestCase iterations:
-         * ------------------------------------
-         * rocket id   | rocket name  | country
-         * ------------------------------------
-         * falcon1     | Falcon 1     | Republic of the Marshall Islands
-         * falconheavy | Falcon Heavy | United States
-         * starship    | Starship     | United States
-         *
-         * Parameterize the test
-         *
-         * Create a new GraphQL query from the given query string
-         * Pass in the rocket id as a variable value
-         *
-         * POST this object to https://api.spacex.land/graphql/
-         * (that's the base URL, so '/' suffices as an endpoint)
-         *
-         * Assert that the name of the rocket is equal to the value in the TestCase
-         * Use "data.rocket.name" as the argument to SelectToken()
-         * to extract the required value from the response
-         *
-         * Also, assert that the country of the rocket is equal to the value in the TestCase
-         * Use "data.rocket.country" as the argument to SelectToken()
-         * to extract the required value from the response
+        /**
+         * Perform an HTTP GET to /customer/12212/account/12345
+         * 
+         * Deserialize the response into an object of type Account
+         * 
+         * Check that the value of the Balance property of this account is equal to 98765
          */
-        [TestCase("falcon1", "Falcon 1", "Republic of the Marshall Islands", TestName = "Falcon 1 was launched in the Republic of the Marshall Islands")]
-        [TestCase("falconheavy", "Falcon Heavy", "United States", TestName = "Falcon Heavy was launched in the United States")]
-        [TestCase("starship", "Starship", "United States", TestName = "Starship was launched in the United States")]
-        public async Task getRocketDataById_checkNameAndCountry
-            (string rocketId, string expectedName, string expectedCountry)
+        [Test]
+        public async Task GetAccount_CheckBalance_ShouldEqual98765()
         {
-            string query = @"
-                query getRocketData($id: ID!)
-                {
-                    rocket(id: $id) {
-                        name
-                        country
-                    }
-                }
-            ";
+            RestRequest request = new RestRequest($"/customer/12212/account/12345", Method.Get);
 
-            var variables = new
-            {
-                id = rocketId
-            };
+            RestResponse<Account> response = await client.ExecuteAsync<Account>(request);
 
-            GraphQLQuery graphQLQuery = new GraphQLQuery
-            {
-                Query = query,
-                Variables = JsonConvert.SerializeObject(variables)
-            };
+            Account account = response.Data;
 
-            RestRequest request = new RestRequest("/", Method.Post);
-
-            request.AddJsonBody(graphQLQuery);
-
-            RestResponse response = await client.ExecuteAsync(request);
-
-            JObject responseData = JObject.Parse(response.Content);
-
-            Assert.That(
-                responseData.SelectToken("data.rocket.name").ToString(),
-                Is.EqualTo(expectedName)
-            );
-
-            Assert.That(
-                responseData.SelectToken("data.rocket.country").ToString(),
-                Is.EqualTo(expectedCountry)
-            );
+            Assert.That(account.Balance, Is.EqualTo(98765));
         }
     }
 }
