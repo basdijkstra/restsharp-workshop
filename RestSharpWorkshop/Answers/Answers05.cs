@@ -23,11 +23,8 @@ namespace RestSharpWorkshop.Answers
         }
 
         /*******************************************************
-         * Create a new GraphQL query as a string with value
-         * { company { name ceo } }
-         *
-         * Create a new GraphQLQuery object and use the query as
-         * the value for the Query property
+         * Create a new GraphQLQuery object and use the given
+         * query as the value for the Query property
          * 
          * POST this object to /simple-graphql
          *
@@ -72,10 +69,9 @@ namespace RestSharpWorkshop.Answers
          * Parameterize the test
          *
          * Create a new GraphQL query from the given query string
-         * Pass in the rocket id as a variable value
+         * Pass in the rocket id as a variable value (the variable name is 'id')
          *
-         * POST this object to https://api.spacex.land/graphql/
-         * (that's the base URL, so '/' suffices as an endpoint)
+         * POST this object to /graphql-with-variables
          *
          * Assert that the name of the rocket is equal to the value in the TestCase
          * Use "data.rocket.name" as the argument to SelectToken()
@@ -112,11 +108,13 @@ namespace RestSharpWorkshop.Answers
                 Variables = JsonConvert.SerializeObject(variables)
             };
 
-            RestRequest request = new RestRequest("/", Method.Post);
+            RestRequest request = new RestRequest("/graphql-with-variables", Method.Post);
 
             request.AddJsonBody(graphQLQuery);
 
             RestResponse response = await client.ExecuteAsync(request);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
 
             JObject responseData = JObject.Parse(response.Content);
 

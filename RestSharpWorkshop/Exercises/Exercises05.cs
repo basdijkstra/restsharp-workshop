@@ -11,7 +11,7 @@ namespace RestSharpWorkshop.Exercises
     public class Exercises05
     {
         // The base URL for our tests
-        private const string BASE_URL = "https://api.spacex.land/graphql/";
+        private const string BASE_URL = "http://localhost:9876";
 
         // The RestSharp client we'll use to make our requests
         private RestClient client;
@@ -23,14 +23,10 @@ namespace RestSharpWorkshop.Exercises
         }
 
         /*******************************************************
-         * Create a new GraphQL query as a string with value
-         * { company { name ceo coo } }
+         * Create a new GraphQLQuery object and use the given
+         * query as the value for the Query property
          * 
-         * Create a new GraphQLQuery object and use the query as
-         * the value for the Query property
-         *
-         * POST this object to https://api.spacex.land/graphql/
-         * (that's the base URL, so '/' suffices as an endpoint)
+         * POST this object to /simple-graphql
          *
          * Assert that the name of the CEO is Elon Musk
          *
@@ -40,6 +36,7 @@ namespace RestSharpWorkshop.Exercises
         [Test]
         public async Task GetCompanyData_checkCeo_shouldBeElonMusk()
         {
+            string query = "{ company { name ceo } }";
         }
 
         /*******************************************************
@@ -54,10 +51,9 @@ namespace RestSharpWorkshop.Exercises
          * Parameterize the test
          *
          * Create a new GraphQL query from the given query string
-         * Pass in the rocket id as a variable value
+         * Pass in the rocket id as a variable value (the variable name is 'id')
          *
-         * POST this object to https://api.spacex.land/graphql/
-         * (that's the base URL, so '/' suffices as an endpoint)
+         * POST this object to /graphql-with-variables
          *
          * Assert that the name of the rocket is equal to the value in the TestCase
          * Use "data.rocket.name" as the argument to SelectToken()

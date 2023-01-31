@@ -42,7 +42,9 @@ namespace RestSharpWorkshop
             AddMockResponseForPostAccount();
             AddMockResponseForGetAccount12345();
             AddMockResponseForSimpleGraphQLQuery();
-            AddMockResponseForGraphQLQueryWithVariables();
+            AddMockResponseForGraphQLQueryWithVariablesFalcon1();
+            AddMockResponseForGraphQLQueryWithVariablesFalconHeavy();
+            AddMockResponseForGraphQLQueryWithVariablesStarship();
         }
 
         private void AddMockResponseForCustomer12212()
@@ -177,18 +179,8 @@ namespace RestSharpWorkshop
                 .WithBodyAsJson(response));
         }
 
-        private void AddMockResponseForGraphQLQueryWithVariables()
+        private void AddMockResponseForGraphQLQueryWithVariablesFalcon1()
         {
-            var expectedQuery = new
-            {
-                query = this.parameterizedQuery,
-                operationName = "getRocketData",
-                variables = new
-                {
-                    id = "falcon1",
-                },
-            };
-
             var response = new
             {
                 data = new
@@ -202,8 +194,51 @@ namespace RestSharpWorkshop
             };
 
             this.Server?.Given(Request.Create().WithPath("/graphql-with-variables").UsingPost()
-                .WithHeader("Content-Type", "application/graphql+json; charset=utf-8")
-                .WithBody(new JsonMatcher(expectedQuery)))
+                .WithBody(new JmesPathMatcher("contains(variables, 'falcon1')")))
+                .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(response));
+        }
+
+        private void AddMockResponseForGraphQLQueryWithVariablesFalconHeavy()
+        {
+            var response = new
+            {
+                data = new
+                {
+                    rocket = new
+                    {
+                        name = "Falcon Heavy",
+                        country = "United States",
+                    },
+                },
+            };
+
+            this.Server?.Given(Request.Create().WithPath("/graphql-with-variables").UsingPost()
+                .WithBody(new JmesPathMatcher("contains(variables, 'falconheavy')")))
+                .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(response));
+        }
+
+        private void AddMockResponseForGraphQLQueryWithVariablesStarship()
+        {
+            var response = new
+            {
+                data = new
+                {
+                    rocket = new
+                    {
+                        name = "Starship",
+                        country = "United States",
+                    },
+                },
+            };
+
+            this.Server?.Given(Request.Create().WithPath("/graphql-with-variables").UsingPost()
+                .WithBody(new JmesPathMatcher("contains(variables, 'starship')")))
                 .RespondWith(Response.Create()
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
