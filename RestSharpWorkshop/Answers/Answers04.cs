@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace RestSharpWorkshop.Answers
 {
     [TestFixture]
-    public class Exercises04 : TestBase
+    public class Answers04 : TestBase
     {
         // The base URL for our tests
         private const string BASE_URL = "http://localhost:9876";
