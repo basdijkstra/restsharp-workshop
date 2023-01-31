@@ -8,9 +8,7 @@ namespace RestSharpWorkshop
 {
     public class TestBase
     {
-        protected WireMockServer Server { get; private set; }
-
-        
+        protected WireMockServer Server { get; private set; }        
 
         private readonly string parameterizedQuery = @"query getRocketData($id: ID!)
             {
@@ -159,11 +157,6 @@ namespace RestSharpWorkshop
         /// </summary>
         private void AddMockResponseForSimpleGraphQLQuery()
         {
-            var expectedQuery = new
-            {
-                query = "{ company { name ceo } }"
-            };
-
             var response = new
             {
                 data = new
@@ -177,7 +170,7 @@ namespace RestSharpWorkshop
             };
 
             this.Server?.Given(Request.Create().WithPath("/simple-graphql").UsingPost()
-                .WithBody(new JsonMatcher(expectedQuery)))
+                .WithBody(new JmesPathMatcher("query == '{ company { name ceo } }'")))
                 .RespondWith(Response.Create()
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")

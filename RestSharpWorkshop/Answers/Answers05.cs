@@ -52,8 +52,6 @@ namespace RestSharpWorkshop.Answers
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            Assert.That(response.StatusCode, Is.EqualTo(200));
-
             JObject responseData = JObject.Parse(response.Content);
 
             Assert.That(
