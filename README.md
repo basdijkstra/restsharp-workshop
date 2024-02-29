@@ -4,7 +4,7 @@ For those of you looking to gain some experience working with [RestSharp](https:
 
 What do I need?
 ---
-.NET 6 and an IDE of your choice. That's it.
+.NET 6, 7 or 8 and an IDE of your choice. That's it.
 
 What topics do you cover in this workshop?
 ---
@@ -12,6 +12,10 @@ What topics do you cover in this workshop?
 * Creating and running data driven tests using RestSharp and NUnit
 * (De-)serializing C# objects to/from JSON
 * Writing tests for GraphQL APIs
+
+What APIs are invoked in the tests?
+---
+All API calls that you should make in the exercises are mocked using [WireMock.Net](https://github.com/WireMock-Net/WireMock.Net). All mock definitions are included in the project, so you can focus on learning RestSharp.
 
 Running the tests from the command line
 ---
