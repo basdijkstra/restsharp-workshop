@@ -31,6 +31,11 @@ namespace RestSharpWorkshop.Exercises
         [Test]
         public async Task PostSavingsAccount_CheckStatusCode_ShouldEqual201()
         {
+            Account account = new Account();
+            account.Balance = 0;
+            RestRequest request = new RestRequest($"/customer/12212/accounts", Method.Post);
+            RestResponse<Account> response = await client.ExecuteAsync<Account>(request);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         }
 
         /**

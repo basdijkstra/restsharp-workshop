@@ -14,21 +14,26 @@ namespace RestSharpWorkshop.Examples
         // The base URL for our example tests
         private const string BASE_URL = "http://jsonplaceholder.typicode.com";
 
-        // The RestSharp client we'll use to make our requests
-        private RestClient client;
-
-        [OneTimeSetUp]
-        public void SetupRestSharpClient()
+        [Test]
+        public async Task SetBasicAuthentication()
         {
-            client = new RestClient(BASE_URL);
+            var options = new RestClientOptions(BASE_URL)
+            {
+                Authenticator = new HttpBasicAuthenticator("username", "password")
+            };
+
+            var client = new RestClient(options);
         }
 
         [Test]
-        public async Task SetAuthentication()
+        public async Task SetOAuth2Authentication()
         {
-            client.Authenticator = new HttpBasicAuthenticator("username", "password");
+            var options = new RestClientOptions(BASE_URL)
+            {
+                Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator("access_token", "Bearer")
+            };
 
-            client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator("access_token", "Bearer");
+            var client = new RestClient(options);
         }
     }
 }
