@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using RestSharp;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -61,12 +60,25 @@ namespace RestSharpWorkshop.Answers
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            string serverHeaderValue = response.Headers
-                .Where(x => x.Name.Equals("Server"))
-                .Select(x => x.Value.ToString())
-                .FirstOrDefault();
+            string serverHeaderValue = response.Server;
 
             Assert.That(serverHeaderValue, Is.EqualTo("MockServer"));
+        }
+
+        /**
+         * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the response contains a header 'MyHeader' with value 'MyHeaderValue'.
+         */
+        [Test]
+        public async Task GetDataForCustomer12212_CheckMyHeader_ShouldBeMyHeaderValue()
+        {
+            RestRequest request = new RestRequest("/customer/12212", Method.Get);
+
+            RestResponse response = await client.ExecuteAsync(request);
+
+            string myHeader = response.GetHeaderValue("MyHeader");
+
+            Assert.That(myHeader, Is.EqualTo("MyHeaderValue"));
         }
 
         /**

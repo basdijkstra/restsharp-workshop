@@ -51,6 +51,15 @@ namespace RestSharpWorkshop.Exercises
 
         /**
          * Send a new GET request to /customer/12212 using the client defined above.
+         * Check that the response contains a header 'MyHeader' with value 'MyHeaderValue'.
+         */
+        [Test]
+        public async Task GetDataForCustomer12212_CheckMyHeader_ShouldBeMyHeaderValue()
+        {
+        }
+
+        /**
+         * Send a new GET request to /customer/12212 using the client defined above.
          * Check that the response body contains a JSON field 'firstName' with value 'John'.
          */
         [Test]

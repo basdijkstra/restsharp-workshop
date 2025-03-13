@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using RestSharp;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -59,12 +58,21 @@ namespace RestSharpWorkshop.Examples
 
             RestResponse response = await client.ExecuteAsync(request);
 
-            string serverHeaderValue = response.Headers
-                .Where(x => x.Name.Equals("Server"))
-                .Select(x => x.Value.ToString())
-                .FirstOrDefault();
+            string serverHeaderValue = response.Server;
 
             Assert.That(serverHeaderValue, Is.EqualTo("cloudflare"));
+        }
+
+        [Test]
+        public async Task GetDataForUser3_CheckXPoweredByHeader_ShouldBeExpress()
+        {
+            RestRequest request = new RestRequest("/users/3", Method.Get);
+
+            RestResponse response = await client.ExecuteAsync(request);
+
+            string serverHeaderValue = response.GetHeaderValue("X-Powered-By");
+
+            Assert.That(serverHeaderValue, Is.EqualTo("Express"));
         }
 
         [Test]

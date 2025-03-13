@@ -64,6 +64,7 @@ namespace RestSharpWorkshop
                 .RespondWith(Response.Create()
                 .WithHeader("Content-Type", "application/json")
                 .WithHeader("Server", "MockServer")
+                .WithHeader("MyHeader", "MyHeaderValue")
                 .WithBodyAsJson(customer)
                 .WithStatusCode(200));
         }
