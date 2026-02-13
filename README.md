@@ -4,7 +4,7 @@ For those of you looking to gain some experience working with [RestSharp](https:
 
 What do I need?
 ---
-.NET 6, 7 or 8 and an IDE of your choice. That's it.
+.NET 8, 9 or 10 and an IDE of your choice. That's it.
 
 What topics do you cover in this workshop?
 ---
