@@ -53,7 +53,7 @@ namespace RestSharpWorkshop.Examples
             Assert.That(responseData.SelectToken("name").ToString(), Is.EqualTo(expectedName));
         }
 
-        [Test, TestCaseSource("UserData")]
+        [Test, TestCaseSource(nameof(UserData))]
         public async Task GetDataForUser_CheckName_ShouldEqualExpectedName_UsingTestCaseSource
             (int userId, string expectedName)
         {

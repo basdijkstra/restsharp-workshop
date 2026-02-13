@@ -46,7 +46,7 @@ namespace RestSharpWorkshop.Answers
          * Do the same, but now using the [TestCaseSource] attribute. Refer to the CustomerData
          * method defined below.
          */
-        [Test, TestCaseSource("CustomerData")]
+        [Test, TestCaseSource(nameof(CustomerData))]
         public async Task GetDataFor_CheckFirstName_ShouldEqualExpectedName_UsingTestCaseSource
             (int customerId, string expectedFirstName)
         {
